@@ -1,9 +1,12 @@
 import openpyxl
+import xlsxwriter 
 import re
 from pathlib import Path
 
 xlsx_file = Path('elections.xlsx')
 wb_obj = openpyxl.load_workbook(xlsx_file) 
+workbook = xlsxwriter.Workbook('results.xlsx')
+worksheet = workbook.add_worksheet()
 
 # Read the active sheet:
 sheet = wb_obj.active
@@ -21,15 +24,18 @@ for row in sheet.iter_rows(min_row = 2, max_row=3, max_col=5, min_col=3):
         vu = re.sub(r'[ùú]',r'e', vo)
         vote.add(vu)
     for v in vote:
-        print("Vote for {}".format(v))
         names.add(v)
         if v in results:
-            print('Hola')
-            results[v] = results[v]+1
+            results[v] += 1
         else:
             results[v] = 1
 
+row = 0
 for i in sorted(results):
-    print("{}: {} ".format(i, results[i]))
+    worksheet.write(row, 0, i)
+    worksheet.write(row, 1, results[i])
+    row += 1
+
+workbook.close()
 
     
